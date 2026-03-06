@@ -1,0 +1,38 @@
+Package: proSCessoR
+Type: Package
+Title: proSCessoR: Processing of Multimodal Single Cell Datasets
+Version: 0.3.0
+Author: Constanza Marini-Macouzet
+Maintainer: Constanza Marini-Macouzet <cmarinim@fredhutch.org>
+Description: proSCessoR contains the functions for CITE-seq (gene and protein expression) and BCR V(D)J data processing as explained in the flowchart. Code is adapted from Aaron Seese's scripts.
+    The objective is to process CellRanger data by removing background noise, demultiplexing, identifying multiplets, and capturing complete, productive BCR sequences.
+Depends:
+  R (>= 4.1.1),
+  Seurat (>= 4.3.0),
+  Seurat (< 5.0.0)
+Imports:
+  Biostrings,
+  Matrix (>= 1.5-3),
+  airr (>= 1.4.1),
+  alakazam (>= 1.2.1),
+  data.table (>= 1.14.6),
+  dplyr (>= 1.1.0),
+  dsb (>= 1.0.2),
+  ggplot2 (>= 3.5.1),
+  gplots (>= 3.1.1),
+  lubridate (>= 1.9.2),
+  methods,
+  mixtools (>= 2.0.0),
+  purrr (>= 1.0.1),
+  readr (>= 2.1.4),
+  scoper (>= 1.2.1),
+  shazam (>= 1.1.2),
+  tibble (>= 3.2.1),
+  tidyr (>= 1.3.0),
+  patchwork (>= 1.2.0)
+Suggests:
+  tidyverse
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3

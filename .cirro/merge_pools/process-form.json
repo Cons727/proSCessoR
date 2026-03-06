@@ -1,0 +1,71 @@
+{
+  "form": {
+    "type": "object",
+    "properties": { 
+      "mt_threshold": {
+        "default": 0.2,
+        "description": "Proportion of mitochondria expression cutoff.",
+        "title": "Mitochondria Cutoff",
+        "type": "number"
+      },
+      "project_name": {
+        "default": "Study300_Batch01",
+        "description": "Project ID. It usually consists of study ID and batch number.",
+        "title": "Project Name",
+        "type": "string"
+      },
+      "batch_name": {
+        "default": "Batch01",
+        "description": "Batch number or ID.",
+        "title": "Batch Name",
+        "type": "string"
+      },
+      "ref_vdj": {
+        "default": "airr_c_human",
+        "description": "VDJ references version used for annotation.",
+        "title": "VDJ Reference Version",
+        "type": "string",
+        "enum": ["airr_c_human", "ref-2024.07.19"],
+        "enumNames": ["OGRDB Human (2024.01.11)", "IMGT Human (2024.07.19)"]
+      },
+      "ref_vdj_type": {
+        "default": "ogrdb",
+        "description": "Either ogrdb or imgt",
+        "title": "VDJ Reference Database",
+        "type": "string",
+        "enum": ["ogrdb", "imgt"],
+        "enumNames": ["OGRDB", "IMGT"]
+      },
+      "vdj_type": {
+        "default": "vdj_b",
+        "description": "B cell receptor or T cell receptor data",
+        "title": "VDJ Cell Type",
+        "type": "string",
+        "enum": ["vdj_b", "vdj_t"],
+        "enumNames": ["BCR", "TCR"]
+      },
+      "metadata": {
+        "description": "File containig metadata of the project.",
+        "title": "Metadata File",
+        "type": "string",
+        "pathType": "references",
+        "file": "**/spreadsheet_csv/**/*.csv"
+      },
+      "clone": {
+        "default": "true",
+        "description": "Perform clonotyping analysis on these files?",
+        "title": "Perform Clonotyping Analysis?",
+        "type": "string",
+        "enum": ["true", "false"],
+        "enumNames": ["Yes", "No"]
+      },
+      "spikein": {
+        "default": "NULL",
+        "description": "Hashtag of spike-in cells. The hashtags listed here won't be used for analysis.",
+        "title": "Spike-in Hashtag",
+        "type": "string"
+      }
+    }
+  },
+  "ui": {}
+}

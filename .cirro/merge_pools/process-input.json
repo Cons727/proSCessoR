@@ -1,0 +1,13 @@
+{
+  "input_directory": "$.params.inputs[0].s3|/data/*",
+  "output_directory": "$.params.dataset.s3|/data",
+  "project_name": "$.params.dataset.paramJson.project_name",
+  "batch_name": "$.params.dataset.paramJson.batch_name",
+  "mt_threshold": "$.params.dataset.paramJson.mt_threshold",
+  "ref_vdj": "$.params.dataset.paramJson.ref_vdj",
+  "ref_vdj_type": "$.params.dataset.paramJson.ref_vdj_type",
+  "vdj_type": "$.params.dataset.paramJson.vdj_type",
+  "metadata": "$.params.dataset.paramJson.metadata",
+  "clone": "$.params.dataset.paramJson.clone",
+  "spikein": "$.params.dataset.paramJson.spikein"
+}
