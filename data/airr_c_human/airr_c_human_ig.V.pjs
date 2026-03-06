@@ -1,0 +1,25 @@
+{
+  "version": "1.2",
+  "dbname": "airr_c_human_ig.V",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "OGRDB human germline",
+  "number-of-letters": 33832,
+  "number-of-sequences": 342,
+  "last-updated": "2024-01-08T14:26:00",
+  "number-of-volumes": 1,
+  "number-of-taxids": 1,
+  "bytes-total": 137335,
+  "bytes-to-cache": 37023,
+  "files": [
+    "airr_c_human_ig.V.pdb",
+    "airr_c_human_ig.V.phr",
+    "airr_c_human_ig.V.pin",
+    "airr_c_human_ig.V.pog",
+    "airr_c_human_ig.V.pos",
+    "airr_c_human_ig.V.pot",
+    "airr_c_human_ig.V.psq",
+    "airr_c_human_ig.V.ptf",
+    "airr_c_human_ig.V.pto"
+  ]
+}

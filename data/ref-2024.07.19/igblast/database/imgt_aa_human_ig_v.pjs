@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "imgt_aa_human_ig_v",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "/fh/fast/mcelrath_j/McElrath_NGS/C_Marini_output/IMGT_ref/ref-2024.07.19/igblast/fasta/imgt_aa_human_ig_v.fasta",
+  "number-of-letters": 69026,
+  "number-of-sequences": 712,
+  "last-updated": "2024-07-19T09:52:00",
+  "number-of-volumes": 1,
+  "bytes-total": 210177,
+  "bytes-to-cache": 75643,
+  "files": [
+    "imgt_aa_human_ig_v.pdb",
+    "imgt_aa_human_ig_v.phr",
+    "imgt_aa_human_ig_v.pin",
+    "imgt_aa_human_ig_v.pog",
+    "imgt_aa_human_ig_v.pos",
+    "imgt_aa_human_ig_v.pot",
+    "imgt_aa_human_ig_v.psq",
+    "imgt_aa_human_ig_v.ptf",
+    "imgt_aa_human_ig_v.pto"
+  ]
+}
