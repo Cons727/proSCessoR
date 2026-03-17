@@ -8,9 +8,9 @@
 #'
 
 
-library(data.table)
 
 IgSADIE <- function(sadie_dir = NULL, project_name) {
+  library(data.table)
   
   if(is.null(sadie_dir)){
     sadie_dir <- paste0("Processing_QC/", project_name, "_IgBLAST_SADIE_Runs")

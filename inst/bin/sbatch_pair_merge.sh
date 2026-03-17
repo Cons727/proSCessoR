@@ -14,7 +14,13 @@ set -e
 # loads python3.8, while
 # ml fhR/4.3.1-foss-2022b
 # loads python3.10
-export PATH=$PATH:/home/$(whoami)/.local/lib/python3.8/site-packages:/home/$(whoami)/.local/bin:/home/$(whoami)/proSCessoR/bin
+
+# Capture the pristine R library path passed down from the wrapper
+export ORIG_LD=$LD_LIBRARY_PATH
+
+# export PATH=$PATH:/home/$(whoami)/.local/lib/python3.8/site-packages:/home/$(whoami)/.local/bin:/home/$(whoami)/proSCessoR/bin
+export PATH=$PATH:${USER_PYTHON_PATH}:/home/$(whoami)/.local/bin
+
 export FILES=`ls | grep "^P[0-9]"`
 
 echo Files: $FILES
@@ -114,7 +120,10 @@ igblastn \
 # ml fhR/4.3.1-foss-2022b
 # loads python3.10
 # Suggestion: use the same python version as in your PATH above
-ml fhR/4.1.1-foss-2020b
+
+# ml fhR/4.1.1-foss-2020b
+# Restore the original C++ library paths so R doesn't crash
+export LD_LIBRARY_PATH=$ORIG_LD
 
 echo "Contig Selection"
 sbatch_contig_selection.R $OUTNAME $VDJ $IGM_IGD

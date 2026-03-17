@@ -27,7 +27,7 @@ if [[ "${DB_NAME}" == "ogrdb" ]]; then
     DB_V=airr_c_human_ig.V
     DB_J=airr_c_human_ig.J
     DB_D=airr_c_human_igh.D
-    DB_C=imgt_human_ig_c
+    DB_C=airr_c_human_igh.C
 
     SEQTYPE=Ig
 fi

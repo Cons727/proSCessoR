@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
-devtools::load_all("~/proSCessoR")
-library(tidyverse)
+suppressPackageStartupMessages(library(proSCessoR))
+suppressPackageStartupMessages(library(tidyverse))
 
 project.name <- commandArgs(trailingOnly = TRUE)[1]
 vdj.type <- commandArgs(trailingOnly = TRUE)[2]

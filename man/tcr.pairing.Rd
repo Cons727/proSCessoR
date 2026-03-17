@@ -14,6 +14,6 @@ tcr.pairing(anno, project_name, singlets_prod = NULL)
 \item{singlets_prod}{Path to singlets_prod_contig.tsv.}
 }
 \description{
-Pairing analysis after chain determination. It returns a data frame.
+Pairing analysis after chain determination. Works with both A/B and G/D. It returns a data frame.
 }
 \keyword{pairing}

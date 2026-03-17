@@ -136,24 +136,12 @@ while getopts "a:t:x:m:e:d:u:n:o:f:p:izh" OPT; do
     esac
 done
 
-# Exit if required arguments are not provided
-# if ! ${READS_SET}; then
-#     echo -e "You must specify the input sequences using the -s option." >&2
-#     exit 1
-# fi
 
 if ! ${AIRR_SET}; then
     echo -e "You must specify IgBLAST AIRR file using the -x option." >&2
     exit 1
 fi
 
-# Check that files exist and determined absolute paths
-# if [ -e ${READS} ]; then
-#     READS=$(realpath ${READS})
-# else
-#     echo -e "File '${READS}' not found." >&2
-#     exit 1
-# fi
 
 if [ -e ${AIRR} ]; then
     AIRR=$(realpath ${AIRR})
@@ -162,17 +150,6 @@ else
     exit 1
 fi
 
-# Set and check species
-# if ! ${SPECIES_SET}; then
-#     SPECIES="human"
-# elif [ ${SPECIES} != "human" ] && \
-#      [ ${SPECIES} != "mouse" ] && \
-#      [ ${SPECIES} != "rabbit" ] && \
-#      [ ${SPECIES} != "rat" ] && \
-#      [ ${SPECIES} != "rhesus_monkey" ]; then
-#     echo "Species (-g) must be one of 'human', 'mouse', 'rabbit', 'rat', or 'rhesus_monkey'." >&2
-#     exit 1
-# fi
 
 # Set regions
 REGIONS="default"
@@ -185,12 +162,7 @@ elif [ ${LOCI} != "ig" ] && [ ${LOCI} != "tr" ]; then
     exit 1
 fi
 
-# Set reference sequence
-# if ! ${REFDIR_SET}; then
-#     REFDIR="/usr/local/share/germlines/imgt/${SPECIES}/vdj"
-# else
-#     REFDIR=$(realpath ${REFDIR})
-# fi
+
 
 # Set distance model
 if ! ${MODEL_SET}; then
@@ -311,7 +283,7 @@ check_error() {
 # Set extension
 #IGBLAST_VERSION=$(igblastn -version  | grep 'Package' |sed s/'Package: '//)
 CHANGEO_VERSION=$(python3 -c "import changeo; print('%s-%s' % (changeo.__version__, changeo.__date__))")
-SCOPER_VERSION=$(Rscript -e "v <- packageVersion('scoper');cat(as.character(v))")
+SCOPER_VERSION=$(env LD_LIBRARY_PATH=$ORIG_LD Rscript -e "v <- packageVersion('scoper');cat(as.character(v))")
 
 # Start
 echo -e "IDENTIFIER: ${OUTNAME}"
@@ -322,34 +294,6 @@ echo -e "SCOPER_VERSION: ${SCOPER_VERSION}"
 echo -e "\nSTART"
 STEP=0
 
-# Convert to FASTA if needed
-# BASE_NAME=$(basename ${READS})
-# EXT_NAME=${BASE_NAME##*.}
-# if [ "${EXT_NAME,,}" == "fastq" ] || [ "${EXT_NAME,,}" == "fq" ]; then
-#     printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Convert to FASTA"
-#     IG_FILE=$(fastq2fasta.py ${READS})
-# else
-#     IG_FILE=${READS}
-# fi
-
-# Run IgBLAST
-# printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "AssignGenes igblast"
-# AssignGenes.py igblast -s ${IG_FILE} --organism ${SPECIES} --loci ${LOCI} \
-#     -b ${IGDATA} --format blast --nproc ${NPROC} \
-#     --outname "${OUTNAME}" --outdir . \
-#      >> $PIPELINE_LOG 2> $ERROR_LOG
-# FMT7_FILE="${OUTNAME}_igblast.fmt7"
-# check_error
-
-# Parse IgBLAST output
-# printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "MakeDb igblast"
-# MakeDb.py igblast -i ${FMT7_FILE} -s ${IG_FILE} --10x ${A10X} -r ${REFDIR} \
-#     --extended --failed ${PARTIAL} --outname "${OUTNAME}" --format ${FORMAT} \
-#     --regions ${REGIONS} \
-#     >> $PIPELINE_LOG 2> $ERROR_LOG
-# DB_PASS="${OUTNAME}_db-pass.${EXT}"
-# DB_FAIL="${OUTNAME}_db-fail.${EXT}"
-# check_error
 
 # Split by chain and productivity
 printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "ParseDb select"
@@ -386,7 +330,7 @@ fi
 # Assign clones
 if $CLONE; then
     printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Single cell filter"
-    singlecell-filter.R -d ${HEAVY_PROD},${LIGHT_PROD} -o . -f ${FORMAT} \
+    env LD_LIBRARY_PATH=$ORIG_LD singlecell-filter.R -d ${HEAVY_PROD},${LIGHT_PROD} -o . -f ${FORMAT} \
     >> $PIPELINE_LOG 2> $ERROR_LOG
     check_error
 
@@ -394,7 +338,7 @@ if $CLONE; then
     LIGHT_PROD="${OUTNAME}_light_${PROD_FIELD}-T_sc-pass.${EXT}"
     if [ "$DIST" == "auto" ]; then
         printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Detect cloning threshold"
-        shazam-threshold.R -d ${HEAVY_PROD},${LIGHT_PROD}  -m ${THRESHOLD_METHOD} -n "${OUTNAME}" \
+        env LD_LIBRARY_PATH=$ORIG_LD shazam-threshold.R -d ${HEAVY_PROD},${LIGHT_PROD}  -m ${THRESHOLD_METHOD} -n "${OUTNAME}" \
         --model ${THRESHOLD_MODEL} --cutoff ${CUTOFF} --spc ${SPC} -o . \
         -f ${FORMAT} -p ${NPROC} \
         > /dev/null 2> $ERROR_LOG
@@ -407,14 +351,14 @@ if $CLONE; then
         fi
     else
         printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Calculating distances"
-        shazam-threshold.R -d ${HEAVY_PROD} -m none -n "${OUTNAME}" -o . \
+        env LD_LIBRARY_PATH=$ORIG_LD shazam-threshold.R -d ${HEAVY_PROD} -m none -n "${OUTNAME}" -o . \
         -f ${FORMAT} -p ${NPROC} \
         > /dev/null 2> $ERROR_LOG
         check_error
     fi
 
     printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Define clones (scoper)"
-    scoper-clone.R -d ${HEAVY_PROD},${LIGHT_PROD} -o . -f ${FORMAT} \
+    env LD_LIBRARY_PATH=$ORIG_LD scoper-clone.R -d ${HEAVY_PROD},${LIGHT_PROD} -o . -f ${FORMAT} \
         --method ${MODEL} --threshold ${DIST} --nproc ${NPROC} \
         --log "${LOGDIR}/clone.log" \
         --name "${OUTNAME}_heavy","${OUTNAME}_light" \
@@ -423,12 +367,6 @@ if $CLONE; then
     CLONE_FILE="${OUTNAME}_heavy_clone-pass.${EXT}"
     check_error
 
-    # printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "CreateGermlines"
-    # CreateGermlines.py -d ${CLONE_FILE} --cloned -r ${REFDIR} -g ${CG_GERM} \
-    #     --outname "${OUTNAME}_heavy" --log "${LOGDIR}/germline.log" --format ${FORMAT} \
-    #     >> $PIPELINE_LOG 2> $ERROR_LOG
-    # HEAVY_PROD="${OUTNAME}_heavy_germ-pass.${EXT}"
-	# check_error
 fi
 
 # Zip or delete intermediate files
