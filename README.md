@@ -74,6 +74,16 @@ After merging the GEM pools, the 'preprocessing' function can be run, which incl
     invisible(ifelse(!dir.exists(file.path(".", "Seurat_objects")), dir.create(file.path(".", "Seurat_objects")), FALSE))
     saveRDS(so, paste0("Seurat_objects/", project.name, "_dsb_whole_dataset_seurat.rds"))
 
+If 'extract_metrics'=TRUE was used in preprocessing function, generate quality control plots and tables.
+
+    SummaryQC(batches)
+
+Add the metadata to the merged Seurat object. The metadata file must contain HTO and Batch_Pool information. The following function returns a clean Seurat object (without empty droplets and no spike-in control (SAC.HTO argument)) and saves the QC'ed singlet barcodes per batch (or GEM pool) for pairing and clonotyping steps. If the metadata includes SortPop_Small, 'print_res'=TRUE will return demultiplexing heatmaps with short sample IDs.
+
+    singlets.seurat <- join_md(merged.seurat, md_path = "HVTN302_metadata.csv", SAC_HTO = SAC.HTO, print_res = TRUE)
+
+Make sure the QC plots and tables look good before continuing to the next step.
+
 ### Optional: Preprocessing by pool
 The first step is preprocessing all the files. Make sure 'batches' only contains paths to CellRanger output. Change the working directory for every batch to avoid overwriting (TODO: add file_name argument to extract_metrics). The 'preprocessing_byPool' function includes the background correction and demultiplexing. It will return a Seurat object with only singlets, and the metrics reports are saved as *ReportMetrics*. After running each batch, merge or integrate all the datasets together.
 
@@ -102,32 +112,25 @@ The first step is preprocessing all the files. Make sure 'batches' only contains
 
 ## Pairing and clonotype analyses
 
-If 'extract_metrics'=TRUE was used in preprocessing function, generate quality control plots and tables.
+The pairing and clonotyping steps are performed in one simple function, which will be run in a subshell of the HPC. Since each python and R versions use different C++ libraries, it is important to specify the python site-packages path and the python module.
 
-    SummaryQC(batches)
+    pair_and_clone(outname = project.name,
+               ref = "/home/OGRDB_ref/ref-2026.01.26/airr_c_human",
+               db_name = "ogrdb",
+               vdj = "vdj_b",
+               igm_igd = "FALSE",
+               python_site_packages = "/home/.local/lib/python3.8/site-packages",
+               python_module = "Python/3.8.2-GCCcore-9.3.0")
 
-Add the metadata to the merged Seurat object. The metadata file must contain HTO and Batch_Pool information. The following function returns a clean Seurat object (without empty droplets and no spike-in control (SAC.HTO argument)) and saves the QC'ed singlet barcodes per batch (or GEM pool) for pairing and clonotyping steps. If the metadata includes SortPop_Small, 'print_res'=TRUE will return demultiplexing heatmaps with short sample IDs.
+When the process has finished, the final result is saved as *today_project.name_ChangeO-IgSADIE.tsv* in the working directory.
 
-    singlets.seurat <- join_md(merged.seurat, md_path = "HVTN302_metadata.csv", SAC_HTO = SAC.HTO, print_res = TRUE)
+If you only need the pairing analysis without performing the clonotyping, use the following function
 
-Make sure the QC plots and tables look good before continuing to the next step.
+    pair_and_merge(outname = project.name,
+               ref = "/home/OGRDB_ref/ref-2026.01.26/airr_c_human",
+               db_name = "ogrdb",
+               vdj = "vdj_b",
+               igm_igd = "FALSE",
+               python_site_packages = "/home/.local/lib/python3.8/site-packages")
 
-Pairing and clonotyping analysis are run in one command
-
-    # Set variables
-    # Can be the same as project.name
-    OUTNAME="HVTN302_BCS2036"
-    # Make sure to use the most recent IMGT or OGRDB reference version, or update to a new one using config_IMGT_ref.sh script.
-    REF="/fh/fast/_VIDD/HVTN/Vaccine/B_cell_Sequencing/IMGT_ref/ref-2023.11.28"
-    DB_NAME=imgt #or
-    DB_NAME=ogrdb
-    # Declare if processing TCR (vdj_t) or BCR (vdj_b) data and if you want to keep IgM+IgD+ B cells (TRUe or FALSE)
-    VDJ=vdj_b
-    IGM_IGD=FALSE
-    # FASTA file is always saved in Processing_QC/`project.name`_singlets_prod_contig.fasta
-    FASTA=Processing_QC/"$OUTNAME"_singlets_prod_contig.fasta
-
-    # If running the analysis with slurm you can call sbatch_pair_clone.sh for clonotyping analysis or sbatch_pair_merge.sh if you don't need the clonotype results
-    sbatch -c 16 --mail-user=$(whoami)@fredhutch.org -o prSCR-36.log -J prSCR-36 --mail-type=END,FAIL --export=OUTNAME=$OUTNAME,REF=$REF,DB_NAME=$DB_NAME,VDJ=$VDJ,IGM_IGD=$IGM_IGD,FASTA=$FASTA path/to/sbatch_pair_clone.sh
-
-When the process has finished, the final result is saved as *today_project.name_ChangeO-IgSADIE.tsv* or *today_project.name_IgSADIE.tsv* in the working directory.
+When the process has finished, the final result is saved as *today_project.name_IgSADIE.tsv* in the working directory.
