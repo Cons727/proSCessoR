@@ -302,15 +302,15 @@ ParseDb.py select -d "${AIRR}" -f ${LOCUS_FIELD} -u IGH TRB TRD \
     >> $PIPELINE_LOG 2> $ERROR_LOG
 ParseDb.py select -d "${AIRR}" -f ${LOCUS_FIELD} -u IGK IGL TRA TRG \
     -o "${OUTNAME}_light.${EXT}" \
-    >> $PIPELINE_LOG 2> $ERROR_LOG
+    >> $PIPELINE_LOG 2>> $ERROR_LOG
 HEAVY_ALL="${OUTNAME}_heavy.${EXT}"
 LIGHT_ALL="${OUTNAME}_light.${EXT}"
 
 printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "ParseDb split"
 ParseDb.py split -d "${OUTNAME}_heavy.${EXT}" -f ${PROD_FIELD} \
-    >> $PIPELINE_LOG 2> $ERROR_LOG
+    >> $PIPELINE_LOG 2>> $ERROR_LOG
 ParseDb.py split -d "${OUTNAME}_light.${EXT}" -f ${PROD_FIELD} \
-    >> $PIPELINE_LOG 2> $ERROR_LOG
+    >> $PIPELINE_LOG 2>> $ERROR_LOG
 HEAVY_PROD="${OUTNAME}_heavy_${PROD_FIELD}-T.${EXT}"
 LIGHT_PROD="${OUTNAME}_light_${PROD_FIELD}-T.${EXT}"
 HEAVY_NON="${OUTNAME}_heavy_${PROD_FIELD}-F.${EXT}"
@@ -331,7 +331,7 @@ fi
 if $CLONE; then
     printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Single cell filter"
     env LD_LIBRARY_PATH=$ORIG_LD singlecell-filter.R -d ${HEAVY_PROD},${LIGHT_PROD} -o . -f ${FORMAT} \
-    >> $PIPELINE_LOG 2> $ERROR_LOG
+    >> $PIPELINE_LOG 2>> $ERROR_LOG
     check_error
 
     HEAVY_PROD="${OUTNAME}_heavy_${PROD_FIELD}-T_sc-pass.${EXT}"
@@ -341,7 +341,7 @@ if $CLONE; then
         env LD_LIBRARY_PATH=$ORIG_LD shazam-threshold.R -d ${HEAVY_PROD},${LIGHT_PROD}  -m ${THRESHOLD_METHOD} -n "${OUTNAME}" \
         --model ${THRESHOLD_MODEL} --cutoff ${CUTOFF} --spc ${SPC} -o . \
         -f ${FORMAT} -p ${NPROC} \
-        > /dev/null 2> $ERROR_LOG
+        > /dev/null 2>> $ERROR_LOG
         check_error
 
         if [ $THRESHOLD_METHOD == "gmm" ]; then
@@ -353,7 +353,7 @@ if $CLONE; then
         printf "  %2d: %-*s $(date +'%H:%M %D')\n" $((++STEP)) 30 "Calculating distances"
         env LD_LIBRARY_PATH=$ORIG_LD shazam-threshold.R -d ${HEAVY_PROD} -m none -n "${OUTNAME}" -o . \
         -f ${FORMAT} -p ${NPROC} \
-        > /dev/null 2> $ERROR_LOG
+        > /dev/null 2>> $ERROR_LOG
         check_error
     fi
 
@@ -362,7 +362,7 @@ if $CLONE; then
         --method ${MODEL} --threshold ${DIST} --nproc ${NPROC} \
         --log "${LOGDIR}/clone.log" \
         --name "${OUTNAME}_heavy","${OUTNAME}_light" \
-        >> $PIPELINE_LOG 2> $ERROR_LOG
+        >> $PIPELINE_LOG 2>> $ERROR_LOG
 
     CLONE_FILE="${OUTNAME}_heavy_clone-pass.${EXT}"
     check_error
